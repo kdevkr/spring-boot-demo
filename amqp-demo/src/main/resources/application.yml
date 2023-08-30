@@ -1,0 +1,11 @@
+spring.main.banner-mode: off
+spring.application.name: amqp-demo
+server.port: 8080
+
+spring.rabbitmq:
+  host: localhost
+  port: 5672
+  username: admin
+  password: admin!QAZ
+
+spring.cloud.stream:

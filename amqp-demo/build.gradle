@@ -1,0 +1,7 @@
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+//    implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+    implementation 'org.apache.commons:commons-lang3'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
