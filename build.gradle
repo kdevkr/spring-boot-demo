@@ -30,6 +30,7 @@ allprojects {
     dependencyManagement {
         imports {
             mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2022.0.4'
+            mavenBom 'io.sentry:sentry-bom:6.20.0'
         }
     }
 }
