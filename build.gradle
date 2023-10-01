@@ -23,6 +23,7 @@ allprojects {
     }
 
     dependencies {
+        implementation project(':common-lib')
         implementation 'org.springframework.boot:spring-boot-starter'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
