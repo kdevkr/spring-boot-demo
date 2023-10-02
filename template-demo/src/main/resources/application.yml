@@ -1,0 +1,31 @@
+spring.main.banner-mode: off
+server.port: 8080
+
+spring.freemarker:
+  enabled: on
+  template-loader-path: classpath:/templates/
+  expose-spring-macro-helpers: on
+  suffix: .ftlh
+
+spring.thymeleaf:
+  enabled: on
+  enable-spring-el-compiler: on
+  template-resolver-order: 1
+  prefix: classpath:/templates/
+  suffix: .html
+
+logging.group:
+  template:
+    - freemarker
+    - org.thymeleaf
+logging.level:
+  web: INFO
+  template: INFO
+
+server:
+  error:
+    whitelabel.enabled: on
+    include-message: always
+    include-stacktrace: never
+    include-binding-errors: never
+    include-exception: false
