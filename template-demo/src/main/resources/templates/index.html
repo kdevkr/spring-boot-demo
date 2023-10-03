@@ -1,11 +1,11 @@
-<!-- NOTE: Index Page with Thymeleaf -->
+<!--/* NOTE: Index Page with Thymeleaf */-->
 <!DOCTYPE html>
 <html th:lang="${#locale.language}">
 <head>
-    <title>Application</title>
+    <title th:text="${#messages.msgOrNull('application.name')}">Application</title>
     <meta charset="UTF-8">
 </head>
 <body>
-<p>Hello World</p>
+<p th:text="${#messages.msgOrNull('hello.world')}">Hello World</p>
 </body>
 </html>

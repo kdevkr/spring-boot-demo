@@ -29,3 +29,6 @@ server:
     include-stacktrace: never
     include-binding-errors: never
     include-exception: false
+spring:
+  messages:
+    type: YAML
