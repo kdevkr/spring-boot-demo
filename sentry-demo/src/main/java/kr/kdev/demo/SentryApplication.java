@@ -13,7 +13,12 @@ public class SentryApplication {
     }
 
     @GetMapping("/")
-    public String index() throws Throwable {
-        throw new Throwable("Hello");
+    public String index() {
+        return "ok";
+    }
+
+    @GetMapping("/e")
+    public String e() {
+        throw new ApiException("Hello").withErrorCode(1);
     }
 }

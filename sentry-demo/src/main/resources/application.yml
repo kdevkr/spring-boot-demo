@@ -1,5 +1,7 @@
 server.port: 8080
 spring.application.name: sentry
+spring.main.banner-mode: off
+spring.main.web-application-type: servlet
 
 sentry:
   dsn:
@@ -9,3 +11,11 @@ sentry:
   send-default-pii: true
   environment: ${SENTRY_ENVIRONMENT:local}
   ignored-exceptions-for-type:
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info

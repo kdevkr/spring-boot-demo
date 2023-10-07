@@ -6,5 +6,8 @@ dependencies {
     api 'io.netty:netty-buffer:4.1.97.Final'
 }
 jar {
-    enabled false
+    enabled(true)
+}
+bootJar {
+    enabled(false)
 }
