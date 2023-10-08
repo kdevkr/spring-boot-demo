@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>Websocket</title>
+    <meta charset="UTF-8">
+
+    <p id="output"></p>
+
+    <script type="text/javascript" src="/webjars/jquery/jquery.slim.js"></script>
+    <script type="text/javascript" src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script type="text/javascript" src="/webjars/stomp-websocket/stomp.min.js"></script>
+</head>
+<body>
+
+<script>
+    const client = new SockJS("/wss");
+    client.onmessage = (e) => {
+        console.log(e.data, e)
+        document.getElementById("output").innerHTML = e.data;
+    }
+    client.onopen = () => {
+        console.log('Connection Established', client)
+    }
+    client.onclose = () => {
+        console.log('Connection Closed', client)
+    }
+    client.onerror = (e) => {
+        console.log(e)
+    }
+</script>
+</body>
+</html>

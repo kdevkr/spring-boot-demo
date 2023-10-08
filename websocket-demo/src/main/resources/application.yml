@@ -1,0 +1,10 @@
+server.port: 8080
+spring.application.name: Websocket
+
+server.servlet.session:
+  tracking-modes: cookie
+  persistent: on
+  timeout: 1h
+
+logging.level:
+  org.springframework.web.socket: trace
