@@ -9,8 +9,8 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.session.web.socket.server.SessionRepositoryMessageInterceptor;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,15 +25,15 @@ public class StompController {
     @SendTo("/topic/hello")
     @MessageMapping("/hello")
     public Map<String, String> hello(GenericMessage<String> message,
-                                     @Header(name = "simpSessionId") String sessionId,
-                                     @Header(name = "simpSessionAttributes") Map<String, String> sessionAttributes) {
-        String httpSessionId = sessionAttributes.get(HttpSessionHandshakeInterceptor.HTTP_SESSION_ID_ATTR_NAME);
+                                     @Header(name = "simpSessionId") String wsSessionId,
+                                     @Header(name = "simpSessionAttributes") Map<String, Object> sessionAttributes) {
+        String sessionId = SessionRepositoryMessageInterceptor.getSessionId(sessionAttributes);
 
         Map<String, String> payload = new HashMap<>();
-        payload.put("message", "Hello, %s".formatted(httpSessionId));
+        payload.put("message", "Hello, %s".formatted(sessionId));
 
         // NOTE: similar @SendToUser
-        template.convertAndSendToUser(sessionId, "/queue/hello", payload);
+        template.convertAndSendToUser(wsSessionId, "/queue/hello", payload);
         return payload;
     }
 

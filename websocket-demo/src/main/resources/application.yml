@@ -6,5 +6,10 @@ server.servlet.session:
   persistent: on
   timeout: 1h
 
+spring.security:
+  user:
+    name: user
+    password: pass
+
 logging.level:
-  org.springframework.web.socket: trace
+  org.springframework.web.socket: INFO

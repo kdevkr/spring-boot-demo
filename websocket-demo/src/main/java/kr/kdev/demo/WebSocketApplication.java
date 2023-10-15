@@ -1,5 +1,7 @@
 package kr.kdev.demo;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -16,7 +18,8 @@ public class WebSocketApplication extends AbstractHttpSessionApplicationInitiali
     }
 
     @GetMapping("/")
-    public String index() {
+    public String index(HttpServletRequest request) {
+        HttpSession session = request.getSession(true);
         return "index";
     }
 }
