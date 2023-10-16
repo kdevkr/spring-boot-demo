@@ -13,12 +13,16 @@
 </head>
 <body>
 
-<script>
+<script th:inline="javascript">
+    // NOTE: If react and vue, get token from '/csrf' endpoint
+    const csrfHeaderName = /*[[${_csrf.headerName}]]*/ 'default';
+    const csrfToken = /*[[${_csrf.token}]]*/ 'default';
+
     $(() => {
         const client = new SockJS("/wss");
         client.onmessage = (e) => {
             console.log(e.data, e)
-            document.getElementById("output").innerHTML = e.data;
+            document.getElementById("output").innerHTML = '[SockJS] ' + e.data;
         }
         client.onopen = () => {
             console.log('Connection Established', client)
@@ -30,17 +34,23 @@
             console.log(e)
         }
 
-        const stompClient = Stomp.over(new SockJS('/ws/stomp'));
+        const stompClient = Stomp.over(new SockJS('/ws-stomp'));
         stompClient.debug = () => {
         }
-        // stompClient.debug = undefined;
-        stompClient.connect({}, (e) => {
-            console.log('[connect]', e)
-            stompClient.subscribe('/topic/hello', (m) => {
-                console.log('[subscribe][Broadcast]', m);
+        const headers = {}
+        headers[csrfHeaderName] = csrfToken // NOTE: WebSocket CSRF is not disabled due to spring security settings.
+        stompClient.connect(headers, (frame) => {
+            console.log('[connect]', frame)
+
+            stompClient.subscribe('/topic/hello', (f) => {
+                const body = JSON.parse(f.body)
+                document.getElementById("output-stomp").innerHTML = '[Stomp][Broadcast] ' + body.message;
+                console.log('[subscribe][Broadcast]', body);
             });
-            stompClient.subscribe('/user/queue/hello', (m) => {
-                console.log('[subscribe][Unicast]', m);
+            stompClient.subscribe('/user/queue/hello', (f) => {
+                const body = JSON.parse(f.body)
+                document.getElementById("output-stomp").innerHTML = '[Stomp][Unicast] ' + body.message;
+                console.log('[subscribe][Unicast]', body);
             });
 
             stompClient.send("/app/hello", {}, JSON.stringify({"message": "Hello!"}));

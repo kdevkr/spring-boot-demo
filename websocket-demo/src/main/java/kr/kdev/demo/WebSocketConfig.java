@@ -77,7 +77,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         @Override
         protected void configureStompEndpoints(StompEndpointRegistry registry) {
-            registry.addEndpoint("/ws/stomp")
+            registry.addEndpoint("/ws-stomp")
                     .setAllowedOriginPatterns("*")
                     .withSockJS();
         }

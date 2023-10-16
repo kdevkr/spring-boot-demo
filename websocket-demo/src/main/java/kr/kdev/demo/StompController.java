@@ -9,9 +9,11 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.security.core.Authentication;
 import org.springframework.session.web.socket.server.SessionRepositoryMessageInterceptor;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,19 +28,24 @@ public class StompController {
     @MessageMapping("/hello")
     public Map<String, String> hello(GenericMessage<String> message,
                                      @Header(name = "simpSessionId") String wsSessionId,
-                                     @Header(name = "simpSessionAttributes") Map<String, Object> sessionAttributes) {
-        String sessionId = SessionRepositoryMessageInterceptor.getSessionId(sessionAttributes);
+                                     @Header(name = "simpSessionAttributes") Map<String, Object> sessionAttributes,
+                                     Principal principal) {
+        String username = SessionRepositoryMessageInterceptor.getSessionId(sessionAttributes);
+        if (principal instanceof Authentication) {
+            username = principal.getName();
+        }
 
         Map<String, String> payload = new HashMap<>();
-        payload.put("message", "Hello, %s".formatted(sessionId));
+        payload.put("message", "Hello, %s".formatted(username));
+        payload.put("from", "StompController");
 
         // NOTE: similar @SendToUser
-        template.convertAndSendToUser(wsSessionId, "/queue/hello", payload);
+        template.convertAndSendToUser(wsSessionId, "/queue/hello", payload, message.getHeaders());
         return payload;
     }
 
     @MessageExceptionHandler
-    @SendToUser(destinations = "/queue/error", broadcast = false)
+    @SendToUser(destinations = "/queue/errors", broadcast = false)
     public Map<String, String> handleException(Exception exception) {
         Map<String, String> error = new HashMap<>();
         error.put("exception", exception.getClass().getName());

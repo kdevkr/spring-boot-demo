@@ -1,9 +1,11 @@
 package kr.kdev.demo;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.session.web.socket.events.SessionConnectEvent;
 import org.springframework.stereotype.Component;
@@ -13,8 +15,10 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @AllArgsConstructor
 @Component
 public class WebSocketEventHandler {
@@ -29,17 +33,7 @@ public class WebSocketEventHandler {
 
     @EventListener
     public void handle(SessionConnectedEvent event) {
-        MessageHeaders headers = event.getMessage().getHeaders();
-        String wsSessionId = SimpMessageHeaderAccessor.getSessionId(headers);
-        if (wsSessionId != null) {
-            String username = "anonymous";
-            Principal user = event.getUser();
-            if (user != null) {
-                username = user.getName();
-            }
-            String message = "Hi, %s".formatted(username);
-            messagingTemplate.convertAndSendToUser(wsSessionId, "/queue/hello", Map.of("message", message));
-        }
+        log.info("[WebSocket Connected] {}", event);
     }
 
     @EventListener
@@ -54,7 +48,24 @@ public class WebSocketEventHandler {
 
     @EventListener
     public void handle(SessionSubscribeEvent event) {
-        // TODO: implementation
+        String destination = event.getMessage().getHeaders().get("simpDestination", String.class);
+        MessageHeaders headers = event.getMessage().getHeaders();
+        String wsSessionId = SimpMessageHeaderAccessor.getSessionId(headers);
+        if (wsSessionId != null && destination != null && destination.startsWith("/user/queue/hello")) {
+            String username = "anonymous";
+            Principal user = event.getUser();
+            if (user != null) {
+                username = user.getName();
+            }
+            Map<String, String> payload = new HashMap<>();
+            payload.put("message", "Hi, %s".formatted(username));
+            payload.put("from", "WebSocketEventHandler");
+
+            SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+            headerAccessor.setSessionId(wsSessionId);
+            headerAccessor.setLeaveMutable(true);
+            messagingTemplate.convertAndSendToUser(wsSessionId, "/queue/hello", payload, headerAccessor.getMessageHeaders());
+        }
     }
 
     @EventListener

@@ -3,6 +3,12 @@ spring.application.name: Websocket
 
 server.servlet.session:
   tracking-modes: cookie
+  cookie:
+    path: /
+    http-only: on
+    secure: on
+    same-site: strict
+    max-age: 1d
   persistent: on
   timeout: 1h
 
@@ -10,6 +16,8 @@ spring.security:
   user:
     name: user
     password: pass
+    roles:
+      - USER
 
 logging.level:
   org.springframework.web.socket: INFO
