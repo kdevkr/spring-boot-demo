@@ -34,7 +34,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
         registry.addHandler(simpleHandler(), "/wss")
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(sessionRepositoryMessageInterceptor) // NOTE: insteadOf HttpSessionHandshakeInterceptor
-                .withSockJS();
+                .withSockJS()
+                .setClientLibraryUrl("/webjars/sockjs-client/sockjs.min.js");
     }
 
     @Bean
@@ -79,7 +80,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
         protected void configureStompEndpoints(StompEndpointRegistry registry) {
             registry.addEndpoint("/ws-stomp")
                     .setAllowedOriginPatterns("*")
-                    .withSockJS();
+                    .withSockJS()
+                    .setClientLibraryUrl("/webjars/sockjs-client/sockjs.min.js");
         }
 
         @Override

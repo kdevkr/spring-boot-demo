@@ -1,6 +1,7 @@
 package kr.kdev.demo;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -14,11 +15,7 @@ public class CsrfController {
     private final CsrfTokenRepository csrfTokenRepository;
 
     @RequestMapping("/csrf")
-    public CsrfToken csrf(HttpServletRequest request, CsrfToken token) {
-        if (token == null) {
-            return csrfTokenRepository.generateToken(request);
-        }
-
-        return token;
+    public CsrfToken csrf(HttpServletRequest request, HttpServletResponse response) {
+        return csrfTokenRepository.loadDeferredToken(request, response).get();
     }
 }
