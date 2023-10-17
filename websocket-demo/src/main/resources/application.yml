@@ -13,6 +13,7 @@ server.servlet.session:
   persistent: on
   timeout: 1h
 
+spring.mvc.pathmatch.matching-strategy: ant_path_matcher
 spring.security:
   user:
     name: user
