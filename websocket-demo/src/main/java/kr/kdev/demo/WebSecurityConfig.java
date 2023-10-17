@@ -67,13 +67,13 @@ public class WebSecurityConfig {
 
         http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .maximumSessions(1)
-                .maxSessionsPreventsLogin(true)
+                .maxSessionsPreventsLogin(false)
                 .sessionRegistry(new SessionRegistryImpl()));
 
         // NOTE: Protection Against Exploits
         http
                 .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
-                        .ignoringRequestMatchers("/ws/**/info", "/wss/**/info", "/ws-stomp/**/info")) // NOTE: SockJS /info HTTP Endpoint
+                        .ignoringRequestMatchers("/ws/**", "/wss/**", "/ws-stomp/**")) // NOTE: SockJS /info HTTP Endpoint
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
