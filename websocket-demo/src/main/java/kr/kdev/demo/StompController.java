@@ -6,6 +6,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.support.GenericMessage;
@@ -27,8 +28,8 @@ public class StompController {
     @SendTo("/topic/hello")
     @MessageMapping("/hello")
     public Map<String, String> hello(GenericMessage<String> message,
-                                     @Header(name = "simpSessionId") String wsSessionId,
-                                     @Header(name = "simpSessionAttributes") Map<String, Object> sessionAttributes,
+                                     @Header(name = SimpMessageHeaderAccessor.SESSION_ID_HEADER) String wsSessionId,
+                                     @Header(name = SimpMessageHeaderAccessor.SESSION_ATTRIBUTES) Map<String, Object> sessionAttributes,
                                      Principal principal) {
         String username = SessionRepositoryMessageInterceptor.getSessionId(sessionAttributes);
         if (principal instanceof Authentication) {
@@ -40,9 +41,10 @@ public class StompController {
         payload.put("from", "StompController");
 
         // NOTE: similar @SendToUser
-        template.convertAndSendToUser(wsSessionId, "/queue/hello", payload, message.getHeaders());
+        template.convertAndSendToUser(wsSessionId, "/queue/hello", payload, StompUtil.createHeaders(wsSessionId));
         return payload;
     }
+
 
     @MessageExceptionHandler
     @SendToUser(destinations = "/queue/errors", broadcast = false)

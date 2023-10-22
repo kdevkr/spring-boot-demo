@@ -10,53 +10,76 @@
     <script type="text/javascript" src="/webjars/jquery/jquery.slim.js"></script>
     <script type="text/javascript" src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script type="text/javascript" src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script type="text/javascript" src="/webjars/axios/dist/axios.min.js"></script>
 </head>
 <body>
 
 <script th:inline="javascript">
+    let latitude = 37.532600
+    let longitude = 127.024612
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            console.log('geolocation', position.coords.latitude, position.coords.longitude)
+            latitude = position.coords.latitude
+            longitude = position.coords.longitude
+        });
+    }
+
+    const client = new SockJS("/ws");
+    client.onmessage = (e) => {
+        console.log(e.data, e)
+        document.getElementById("output").innerHTML = '[SockJS] ' + e.data;
+    }
+    client.onopen = () => {
+        console.log('Connection Established', client)
+    }
+    client.onclose = () => {
+        console.log('Connection Closed', client)
+    }
+    client.onerror = (e) => {
+        console.log(e)
+    }
+
     // NOTE: If react and vue, get token from '/csrf' endpoint
     const csrfHeaderName = /*[[${_csrf.headerName}]]*/ 'default';
     const csrfToken = /*[[${_csrf.token}]]*/ 'default';
 
+    const getCsrf = async () => {
+        const res = await axios.get('/csrf')
+        return res.data
+    }
+
     $(() => {
-        const client = new SockJS("/wss");
-        client.onmessage = (e) => {
-            console.log(e.data, e)
-            document.getElementById("output").innerHTML = '[SockJS] ' + e.data;
-        }
-        client.onopen = () => {
-            console.log('Connection Established', client)
-        }
-        client.onclose = () => {
-            console.log('Connection Closed', client)
-        }
-        client.onerror = (e) => {
-            console.log(e)
-        }
+        getCsrf().then(csrf => {
+            console.log('axios.defaults.headers', axios.defaults.headers)
+            axios.defaults.headers.common[csrf.headerName] = csrf.token
 
-        const stompClient = Stomp.over(new SockJS('/ws-stomp'));
-        stompClient.debug = () => {
-        }
-        const headers = {}
-        headers[csrfHeaderName] = csrfToken // NOTE: WebSocket CSRF is not disabled due to spring security settings.
-        stompClient.connect(headers, (frame) => {
-            console.log('[connect]', frame)
+            const stompClient = Stomp.over(new SockJS('/wss'));
+            stompClient.debug = () => {
+            }
+            const headers = {}
+            headers[csrfHeaderName] = csrfToken // NOTE: WebSocket CSRF is not disabled due to spring security settings.
+            // headers[csrf.headerName] = csrf.token // NOTE: get csrf with axios.
+            stompClient.connect(headers, (frame) => {
+                console.log('[connect]', frame)
 
-            stompClient.subscribe('/topic/hello', (f) => {
-                const body = JSON.parse(f.body)
-                document.getElementById("output-stomp").innerHTML = '[Stomp][Broadcast] ' + body.message;
-                console.log('[subscribe][Broadcast]', body);
+                stompClient.subscribe('/topic/hello', (f) => {
+                    const body = JSON.parse(f.body)
+                    document.getElementById("output-stomp").innerHTML = '[Stomp][Broadcast] ' + body.message;
+                    console.log('[subscribe][Broadcast]', body);
+                });
+                stompClient.subscribe('/user/queue/hello', (f) => {
+                    const body = JSON.parse(f.body)
+                    document.getElementById("output-stomp").innerHTML = '[Stomp][Unicast] ' + body.message;
+                    console.log('[subscribe][Unicast]', body);
+                });
+
+                stompClient.send("/app/hello", {}, JSON.stringify({"message": "Hello!"}));
+            }, (e) => {
+                console.log('[error]', e);
             });
-            stompClient.subscribe('/user/queue/hello', (f) => {
-                const body = JSON.parse(f.body)
-                document.getElementById("output-stomp").innerHTML = '[Stomp][Unicast] ' + body.message;
-                console.log('[subscribe][Unicast]', body);
-            });
+        })
 
-            stompClient.send("/app/hello", {}, JSON.stringify({"message": "Hello!"}));
-        }, (e) => {
-            console.log('[error]', e);
-        });
     })
 </script>
 </body>

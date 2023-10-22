@@ -51,7 +51,7 @@ class WebSocketApplicationTest {
         SockJsClient client = new SockJsClient(transports);
         client.start();
 
-        String uri = "ws://localhost:%s/wss".formatted(port);
+        String uri = "ws://localhost:%s/ws".formatted(port);
         CompletableFuture<WebSocketSession> execute = client.execute(new TextWebSocketHandler(), uri);
         WebSocketSession webSocketSession = execute.get();
         Assertions.assertTrue(webSocketSession.isOpen());

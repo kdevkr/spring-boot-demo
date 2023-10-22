@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import java.security.Principal;
 import java.util.HashMap;
@@ -52,10 +51,10 @@ public class WebSocketEventHandler {
         MessageHeaders headers = event.getMessage().getHeaders();
         String wsSessionId = SimpMessageHeaderAccessor.getSessionId(headers);
         if (wsSessionId != null && destination != null && destination.startsWith("/user/queue/hello")) {
-            String username = "anonymous";
-            Principal user = event.getUser();
-            if (user != null) {
-                username = user.getName();
+            String username = null;
+            Principal principal = event.getUser();
+            if (principal != null) {
+                username = principal.getName();
             }
             Map<String, String> payload = new HashMap<>();
             payload.put("message", "Hi, %s".formatted(username));
@@ -64,12 +63,9 @@ public class WebSocketEventHandler {
             SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
             headerAccessor.setSessionId(wsSessionId);
             headerAccessor.setLeaveMutable(true);
-            messagingTemplate.convertAndSendToUser(wsSessionId, "/queue/hello", payload, headerAccessor.getMessageHeaders());
-        }
-    }
 
-    @EventListener
-    public void handle(SessionUnsubscribeEvent event) {
-        // TODO: implementation
+            String user = username != null ? username : wsSessionId;
+            messagingTemplate.convertAndSendToUser(user, "/queue/hello", payload, headerAccessor.getMessageHeaders());
+        }
     }
 }

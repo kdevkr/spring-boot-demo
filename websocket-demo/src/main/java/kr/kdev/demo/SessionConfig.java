@@ -6,10 +6,12 @@ import org.springframework.session.MapSession;
 import org.springframework.session.MapSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
+import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@EnableSpringHttpSession // NOTE: Use 'SESSION' cookie insteadOf JSESSIONID.
 @Configuration
 public class SessionConfig {
 

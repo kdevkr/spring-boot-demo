@@ -8,5 +8,6 @@ dependencies {
     implementation 'org.webjars:jquery:3.7.1'
     implementation 'org.webjars:sockjs-client:1.5.1'
     implementation 'org.webjars:stomp-websocket:2.3.4'
+    implementation 'org.webjars.npm:axios:1.5.0'
     testImplementation 'org.springframework.security:spring-security-test'
 }

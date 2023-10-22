@@ -2,17 +2,12 @@ package kr.kdev.demo;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.session.MapSession;
-import org.springframework.session.SessionRepository;
 import org.springframework.session.web.socket.config.annotation.AbstractSessionWebSocketMessageBrokerConfigurer;
 import org.springframework.session.web.socket.server.SessionRepositoryMessageInterceptor;
-import org.springframework.web.socket.*;
 import org.springframework.web.socket.config.annotation.*;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
-import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 @AllArgsConstructor
 @Slf4j
@@ -20,55 +15,22 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 @Configuration
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final SessionRepository<MapSession> sessionRepository;
+    private static final String NONE_CDN_SOCKJS = "/webjars/sockjs-client/sockjs.min.js";
     private final SessionRepositoryMessageInterceptor<MapSession> sessionRepositoryMessageInterceptor;
-    private final WebSocketRepository webSocketSessionRepository;
+    private final SimpleWebSocketHandler simpleWebSocketHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(simpleHandler(), "/ws")
+        registry.addHandler(simpleWebSocketHandler, "/ws")
                 .setAllowedOriginPatterns("*")
-                .addInterceptors(new HttpSessionHandshakeInterceptor());
+                .addInterceptors(sessionRepositoryMessageInterceptor);
 
         // NOTE: WebSocket with SockJS
-        registry.addHandler(simpleHandler(), "/wss")
+        registry.addHandler(simpleWebSocketHandler, "/ws")
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(sessionRepositoryMessageInterceptor) // NOTE: insteadOf HttpSessionHandshakeInterceptor
                 .withSockJS()
-                .setClientLibraryUrl("/webjars/sockjs-client/sockjs.min.js");
-    }
-
-    @Bean
-    public WebSocketHandler simpleHandler() {
-        return new TextWebSocketHandler() {
-            @Override
-            public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
-                String sessionId = getSessionId(session);
-                MapSession mapSession = sessionRepository.findById(sessionId);
-
-                log.info("[handleMessage] {} - {}, {}", session, message.getPayload(), mapSession);
-            }
-
-            @Override
-            public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-                log.info("[Connection Established] {}", session);
-
-                if (session.isOpen()) {
-                    webSocketSessionRepository.save(session);
-                    session.sendMessage(new TextMessage("Hello, %s".formatted(getSessionId(session))));
-                }
-            }
-
-            @Override
-            public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-                webSocketSessionRepository.remove(session);
-                log.info("[Connection Closed] {} - {}", session, status);
-            }
-
-            private String getSessionId(WebSocketSession session) {
-                return SessionRepositoryMessageInterceptor.getSessionId(session.getAttributes());
-            }
-        };
+                .setClientLibraryUrl(NONE_CDN_SOCKJS);
     }
 
     @AllArgsConstructor
@@ -78,10 +40,10 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
         @Override
         protected void configureStompEndpoints(StompEndpointRegistry registry) {
-            registry.addEndpoint("/ws-stomp")
+            registry.addEndpoint("/wss")
                     .setAllowedOriginPatterns("*")
                     .withSockJS()
-                    .setClientLibraryUrl("/webjars/sockjs-client/sockjs.min.js");
+                    .setClientLibraryUrl(NONE_CDN_SOCKJS);
         }
 
         @Override

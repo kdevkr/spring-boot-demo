@@ -63,7 +63,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").authenticated()
                         .requestMatchers("/login", "/webjars/**", "/csrf").permitAll()
-                        .requestMatchers("/ws/**", "/wss/**", "/ws-stomp/**").permitAll());
+                        .requestMatchers("/ws/**", "/wss/**").permitAll());
 
         http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .maximumSessions(1)
@@ -73,7 +73,7 @@ public class WebSecurityConfig {
         // NOTE: Protection Against Exploits
         http
                 .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
-                        .ignoringRequestMatchers("/ws/**", "/wss/**", "/ws-stomp/**")) // NOTE: SockJS /info HTTP Endpoint
+                        .ignoringRequestMatchers("/ws/**", "/wss/**")) // NOTE: SockJS /info HTTP Endpoint
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
