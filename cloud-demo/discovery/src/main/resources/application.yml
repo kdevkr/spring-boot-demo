@@ -1,0 +1,15 @@
+spring.application.name: Discovery
+spring.main.banner-mode: off
+server.port: 8888
+
+eureka.client:
+  register-with-eureka: false
+  fetch-registry: false
+  region: ap-northeast-2
+
+logging.group:
+  netflix:
+    - com.netflix.eureka
+    - com.netflix.discovery
+logging.level:
+  netflix: off

@@ -6,3 +6,5 @@ include 'sentry-demo'
 include 'jwt-demo'
 include 'template-demo'
 include 'websocket-demo'
+
+include 'cloud-demo:discovery'
