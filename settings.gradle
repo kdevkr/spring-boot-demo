@@ -8,3 +8,5 @@ include 'template-demo'
 include 'websocket-demo'
 
 include 'cloud-demo:discovery'
+include 'cloud-demo:gateway'
+include 'cloud-demo:app'

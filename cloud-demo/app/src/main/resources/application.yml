@@ -1,0 +1,14 @@
+spring.main.banner-mode: off
+spring.application.name: APP-SERVICE
+server.port: 8080
+
+eureka.client:
+  region: ap-northeast-2
+  service-url:
+    defaultZone: ${EUREKA_URI:http://localhost:8888/eureka/}
+eureka.instance:
+  hostname: localhost
+  instance-id: ${spring.application.name}:${random.value}
+
+management.endpoints:
+  web.exposure.include: health, info

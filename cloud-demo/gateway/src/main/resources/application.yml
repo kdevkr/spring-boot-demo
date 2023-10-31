@@ -1,0 +1,21 @@
+spring.main.banner-mode: off
+spring.application.name: Gateway
+server.port: 7777
+
+eureka.client:
+  region: ap-northeast-2
+  service-url:
+    defaultZone: ${EUREKA_URI:http://localhost:8888/eureka/}
+eureka.instance.hostname: localhost
+
+management.endpoints:
+  web.exposure.include: health, info
+
+spring.cloud.gateway:
+  routes:
+    - id: app-service
+      uri: lb://APP-SERVICE # eureka service name => {application.name}
+      predicates:
+        - Path=/app/**
+      filters:
+        - RewritePath=/app/?(?<segment>.*), /$\{segment}
