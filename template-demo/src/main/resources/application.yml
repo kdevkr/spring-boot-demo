@@ -32,3 +32,23 @@ server:
 spring:
   messages:
     type: YAML
+
+spring.mail:
+  protocol: smtp
+  host: smtp.gmail.com
+  port: 587
+  username:
+  password:
+  test-connection: false
+  properties:
+    smtp.auth: true
+    mail.smtp.starttls.enable: true
+    mail.smtp.starttls.required: true
+
+simplejavamail:
+  javaxmail.debug: false
+  smtp.host: ${spring.mail.host}
+  smtp.port: ${spring.mail.port}
+  transportstrategy: SMTP_TLS
+  smtp.username: ${spring.mail.username}
+  smtp.password: ${spring.mail.password}

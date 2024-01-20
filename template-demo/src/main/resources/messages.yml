@@ -1,2 +1,4 @@
 application.name: 애플리케이션
 hello.world: 헬로 월드
+
+mail.sent: 본 메일은 {0} 에 발송되었습니다.

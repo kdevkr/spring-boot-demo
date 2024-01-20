@@ -1,2 +1,4 @@
 application.name: Application
 hello.word: Hello World
+
+mail.sent: This mail was sent at {0}.
