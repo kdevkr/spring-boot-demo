@@ -19,6 +19,9 @@ bin/
 
 ### IntelliJ IDEA ###
 .idea
+!.idea/codeStyles/codeStyleConfig.xml
+!.idea/codeStyles/Project.xml
+!.idea/checkstyle-idea.xml
 *.iws
 *.iml
 *.ipr
