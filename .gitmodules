@@ -1,0 +1,3 @@
+[submodule "actuator-demo"]
+	path = actuator-demo
+	url = https://github.com/kdevkr/spring-boot-actuator-demo.git
